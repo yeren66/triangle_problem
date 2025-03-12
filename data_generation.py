@@ -1,7 +1,7 @@
 import random
 import json
 import os
-from triangle_analysis import is_triangle,
+from triangle_analysis import is_non_triangle_border, is_normal_triangle_border
 
 # 标签映射：将三角形类型转换为整数
 label_map = {
@@ -28,12 +28,29 @@ def triangle_type(a, b, c):
 
 # 生成所有点的三角形数据
 def generate_data(space_size=100):
+    border_size_n = 0
+    border_size_s = 0
     data = []
     for a in range(1, space_size + 1):
         for b in range(1, space_size + 1):
             for c in range(1, space_size + 1):
                 t_type = triangle_type(a, b, c)
+                # if t_type == 'isosceles':
+                #     continue
+                # if t_type == 'equilateral':
+                #     continue
+                # if t_type == 'non-triangle':
+                #     border = is_non_triangle_border(a, b, c)
+                #     border_size_n += 1 if border else 0 
+                # if t_type == 'scalene':
+                #     border = is_normal_triangle_border(a, b, c)
+                #     border_size_s += 1 if border else 0
+                border = False
                 data.append({"a": a, "b": b, "c": c, "label": label_map[t_type]})
+
+    print(f"Generated {len(data)} samples.")
+    print(f"Generated {border_size_n} non-triangle border samples.")
+    print(f"Generated {border_size_s} scalene border samples")
     return data
 
 # 将训练数据随机拆分出验证集和测试集

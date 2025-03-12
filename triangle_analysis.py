@@ -3,7 +3,7 @@ import numpy as np
 from collections import defaultdict
 import json
 
-def is_non_triangle_border(a, b, c, threshold=0.01):
+def is_non_triangle_border(a, b, c, threshold=1):
     """判断是否为非三角形的边界数据
     
     参数:
@@ -23,18 +23,18 @@ def is_non_triangle_border(a, b, c, threshold=0.01):
     # 使用相对误差判断
     for i, sum_pair in enumerate(side_sums):
         if i == 0:
-            relative_error = abs(sum_pair) / (a + b)
+            relative_error = abs(sum_pair) # / (a + b)
         elif i == 1:
-            relative_error = abs(sum_pair) / (b + c)
+            relative_error = abs(sum_pair) # / (b + c)
         else:
-            relative_error = abs(sum_pair) / (a + c)
+            relative_error = abs(sum_pair) # / (a + c)
             
         if relative_error < threshold:
             return True
             
     return False
 
-def is_normal_triangle_border(a, b, c, threshold=0.02):
+def is_normal_triangle_border(a, b, c, threshold=1):
     """判断是否为普通三角形的边界数据
     
     参数:
@@ -59,7 +59,8 @@ def is_normal_triangle_border(a, b, c, threshold=0.02):
     
     for sum_pair, third_side in side_sums:
         # 计算两边之和与第三边的差值的相对误差
-        relative_diff = (sum_pair - third_side) / sum_pair
+        relative_diff = abs(sum_pair - third_side) #/ sum_pair
+        
         if relative_diff < threshold:
             return True
     
@@ -67,7 +68,7 @@ def is_normal_triangle_border(a, b, c, threshold=0.02):
     # 如果任意两边接近相等，就认为是边界数据
     for i in range(3):
         for j in range(i + 1, 3):
-            relative_diff = abs(sides[i] - sides[j]) / max_side
+            relative_diff = abs(sides[i] - sides[j]) # / max_side
             if relative_diff < threshold:
                 return True
     
@@ -121,4 +122,15 @@ def analyze_dataset(data_path='./data_4_class/train.jsonl'):
 
 if __name__ == "__main__":
     # 分析数据集
-    border_cases, total_cases = analyze_dataset()
+    # border_cases, total_cases = analyze_dataset()
+    total = 0
+    boundary = 0
+    for i, j, k in [(i, j, k) for i in range(1, 101) for j in range(1, 101) for k in range(1, 101)]:
+        if i == j or i == k or j == k:
+            continue
+        total += 1
+        if is_normal_triangle_border(i, j, k, 3):
+            boundary += 1
+    print(f"总样本数: {total}")
+    print(f"边界样本数: {boundary} ({boundary/total:.2%})")
+
